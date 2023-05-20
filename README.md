@@ -92,10 +92,10 @@
 
   Great question! Because in the world of open source there are two types of projects we like to imagine exist:
 
-    1) Someone builds something for money and then realizes really all things should be free because this capitalistic system we live in is desinged to parasitize every aspect of our waking moment.
+  1) Someone builds something for money and then realizes really all things should be free because this capitalistic system we live in is desinged to parasitize every aspect of our waking moment.
 
-    or
+  or
 
-    2) Someone does something dumb late at night
+  2) Someone does something dumb late at night
 
   This is the latter
