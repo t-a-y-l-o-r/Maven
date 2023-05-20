@@ -5,6 +5,10 @@ use warnings;
 use IO::Socket::INET;
 use POSIX qw(setsid);
 
+
+STDOUT->autoflush(1);
+
+
 my $login_name = getlogin || getpwuid($<) || die "Cannot get login name";
 my $home = (getpwnam($login_name))[7];
 
@@ -36,35 +40,15 @@ sub main {
     last if defined($daemon);
   }
 
-  if (!defined($daemon)) {
-    my $err_message = "Could not open socket on any port in the range 5000-5019: $!";
-    open my $fh, '>', $canary_file or die "Could not open '$canary_file' $!";
-    print $fh $err_message;
-    close $fh;
-    exit 1;
-  }
+  defined($daemon) or die "Could not open socket on any port in the range 5000-5019: $!";
 
   print "[*] First!\n";
   open my $fh_port, '>', $port_file or die "Could not open '$port_file' $!";
   print $fh_port $port;
   close $fh_port;
 
-  my $last_update = time;  # track last canary file update
-  open my $fh_canary, '>', $canary_file or die "Could not open '$output_file' $!";
-  print $fh_canary "first $last_update\n";
-  close $fh_canary;
-
-
   while (1) {
-    print "[*] Loopy~\n";
-    if (time - (stat($canary_file))[9] >= 60) {
-      my $timestamp = localtime();
-      open $fh_canary, '>', $canary_file or die "Could not open '$canary_file' $!";
-      print $fh_canary "chirp $timestamp\n";
-      close $fh_canary;
-      $last_update = time;
-    }
-
+    # TODO: make this non-blocking?
     while (my $client = $daemon->accept()) {
       my $data = <$client>;
       chomp $data;
