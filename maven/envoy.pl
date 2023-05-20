@@ -17,8 +17,8 @@ sub main {
   my $daemon;
   my $port;
 
-  my $canary_file = "/dev/tmp/maven_canary";
-  my $port_file = "/dev/tmp/maven_port";
+  my $canary_file = "/tmp/maven_canary";
+  my $port_file = "/tmp/maven_port";
   my $output_file = "/home/YOUR_USERNAME/Desktop/received_data.txt";
 
   for ($port = 5000; $port < 5020; $port++) {

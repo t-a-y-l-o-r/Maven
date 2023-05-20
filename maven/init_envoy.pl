@@ -6,6 +6,7 @@ my $login_name = getlogin || getpwuid($<) || die "Cannot get login name";
 my $home = (getpwnam($login_name))[7];
 
 my $script_path = $home . "/Git/scripts/maven/envoy.pl";
+print $script_path . "\n";
 -e $script_path or die "Where is your envoy?\n";
 
 my @stats = stat($script_path);

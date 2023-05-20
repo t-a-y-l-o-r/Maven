@@ -4,7 +4,7 @@ use warnings;
 
 use IO::Socket::INET;
 
-my $port_file = "/dev/tmp/maven_port";
+my $port_file = "/tmp/maven_port";
 
 open my $fh, '<', $port_file or die "Could not open '$port_file' $!";
 my $port = <$fh>;
