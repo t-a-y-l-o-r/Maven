@@ -2,11 +2,15 @@
 use strict;
 use warnings;
 
-my $script_path = $ENV{'HOME'} . "/Git/scripts/maven/envoy.pl";
+my $login_name = getlogin || getpwuid($<) || die "Cannot get login name";
+my $home = (getpwnam($login_name))[7];
 
-my $sb = stat($script_path);
-my $uid = $sb->uid;
-my $gid = $sb->gid;
+my $script_path = $home . "/Git/scripts/maven/envoy.pl";
+-e $script_path or die "Where is your envoy?\n";
+
+my @stats = stat($script_path);
+my $uid = $stats[4];
+my $gid = $stats[5];
 my $username = getpwuid($uid);
 my $groupname = getgrgid($gid);
 
