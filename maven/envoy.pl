@@ -5,6 +5,9 @@ use warnings;
 use IO::Socket::INET;
 use POSIX qw(setsid);
 
+my $login_name = getlogin || getpwuid($<) || die "Cannot get login name";
+my $home = (getpwnam($login_name))[7];
+
 sub daemonize {
   chdir '/' or die "Can't chdir to /: $!";
   open STDIN, '/dev/null' or die "Can't read /dev/null: $!";
@@ -19,7 +22,7 @@ sub main {
 
   my $canary_file = "/tmp/maven_canary";
   my $port_file = "/tmp/maven_port";
-  my $output_file = "/home/YOUR_USERNAME/Desktop/received_data.txt";
+  my $output_file = $home . "/Desktop/received_data.txt";
 
   for ($port = 5000; $port < 5020; $port++) {
     $daemon = IO::Socket::INET->new(
