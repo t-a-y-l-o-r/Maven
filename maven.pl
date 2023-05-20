@@ -6,20 +6,21 @@
   Maven is a dynamic dispatch system for a generalized scripting solution.
   Why would you use it? Well you shouldn't. It was made by me for me.
   No updates will be made to this code for any third-party.
-  In fact it is likely that no updates will be made for any reason unless they do
+  In fact it is likely that no updates will be made for any reason unless they are
 
   No but seriously use at your own risk! This code is in no way secure.
   In fact this should be considered the hackiest perl you've ever laid eyes on.
   Unless you've written perl before, in which case, go away! I dont want your opinons
 
   In general this script will be utialized to run scripts in a structure like so:
-    .
-    ├── django
-    │   └── add_command.pl
-    ├── folder
-    │   └── nested.sh
-    ├── maven.pl
-    └── top_test.sh
+
+  ~/Git/scripts/.
+                ├── django
+                │   └── add_command.pl
+                ├── folder
+                │   └── nested.sh
+                ├── maven.pl
+                └── top_test.sh
 
   Currently it supports all the script types that it supports. Ref run_script if you care.
   It handles none of the errors and may some day log things like usage and errors.
@@ -64,7 +65,7 @@ use constant SCRIPTS => sub {
 
 #
 # ==============================================
-#  Argument Syntax Decider Decision Subroutines
+#  Argument Syntax Decider Decision Thingies
 # ==============================================
 #
 sub top_level_script {
