@@ -11,12 +11,14 @@ my $home = (getpwnam($login_name))[7];
 sub daemonize {
   chdir '/' or die "Can't chdir to /: $!";
   open STDIN, '/dev/null' or die "Can't read /dev/null: $!";
-  open STDOUT, '>/dev/null' or die "Can't write to /dev/null: $!";
+  # open STDOUT, '>/dev/null' or die "Can't write to /dev/null: $!";
+  open STDOUT, '>/tmp/maven_log' or die "Can't write to /dev/null: $!";
   open STDERR, '>&STDOUT' or die "Can't dup stdout: $!";
   setsid or die "Can't start a new session: $!";
 }
 
 sub main {
+  print "Starting main\n";
   my $daemon;
   my $port;
 
@@ -42,27 +44,33 @@ sub main {
     exit 1;
   }
 
-  open my $fh, '>', $port_file or die "Could not open '$port_file' $!";
-  print $fh $port;
-  close $fh;
+  print "[*] First!\n";
+  open my $fh_port, '>', $port_file or die "Could not open '$port_file' $!";
+  print $fh_port $port;
+  close $fh_port;
 
   my $last_update = time;  # track last canary file update
+  open my $fh_canary, '>', $canary_file or die "Could not open '$output_file' $!";
+  print $fh_canary "first $last_update\n";
+  close $fh_canary;
+
 
   while (1) {
-    if (time - $last_update >= 60) {
+    print "[*] Loopy~\n";
+    if (time - (stat($canary_file))[9] >= 60) {
       my $timestamp = localtime();
-      open my $fh, '>', $canary_file or die "Could not open '$canary_file' $!";
-      print $fh "chirp {$timestamp}";
-      close $fh;
+      open $fh_canary, '>', $canary_file or die "Could not open '$canary_file' $!";
+      print $fh_canary "chirp $timestamp\n";
+      close $fh_canary;
       $last_update = time;
     }
 
     while (my $client = $daemon->accept()) {
       my $data = <$client>;
       chomp $data;
-      open my $fh, '>>', $output_file or die "Could not open '$output_file' $!";
-      print $fh "$data\n";
-      close $fh;
+      open my $fh_log, '>>', $output_file or die "Could not open '$output_file' $!";
+      print $fh_log "$data\n";
+      close $fh_log;
     }
 
     sleep 1;
