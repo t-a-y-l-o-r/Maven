@@ -3,15 +3,19 @@ use strict;
 use warnings;
 
 use IO::Socket::INET;
-use File::Slurp;
 
 my $port_file = "/dev/tmp/maven_port";
-my $port = read_file($port_file, chomp => 1);
+
+# Read port from file
+open my $fh, '<', $port_file or die "Could not open '$port_file' $!";
+my $port = <$fh>;
+chomp $port;
+close $fh;
 
 my $socket = IO::Socket::INET->new(
-    PeerAddr => 'localhost',
-    PeerPort => $port,
-    Proto => 'tcp',
+  PeerAddr => 'localhost',
+  PeerPort => $port,
+  Proto => 'tcp',
 );
 
 die "Could not create socket: $!\n" unless $socket;
