@@ -1,0 +1,27 @@
+# Ignore .vscode folder
+.vscode/
+
+# Ignore Python bytecode files
+*.pyc
+__pycache__/
+
+# Ignore Perl build files
+blib/
+Build/
+META.yml
+META.json
+MYMETA.*
+
+# Ignore Shell script logs and temporary files
+*.log
+*.swp
+*.swo
+*.bak
+
+# Ignore editor backup files
+*~
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
