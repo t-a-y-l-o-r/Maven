@@ -2,10 +2,6 @@
 use strict;
 use warnings;
 
-use File::stat;
-use File::Slurp;
-
-my $description = "Maven Envoy Perl Daemon";
 my $script_path = $ENV{'HOME'} . "/Git/scripts/maven/envoy.pl";
 
 my $sb = stat($script_path);
@@ -14,9 +10,9 @@ my $gid = $sb->gid;
 my $username = getpwuid($uid);
 my $groupname = getgrgid($gid);
 
-my $service_content = <<EOF;
+my $envoy_stardust = <<EOF;
 [Unit]
-Description=$description
+Description=Envoy for the Maven
 
 [Service]
 ExecStart=/usr/bin/perl $script_path
@@ -29,4 +25,6 @@ Environment=PERL5LIB=/path/to/your/perl/libs
 WantedBy=multi-user.target
 EOF
 
-write_file('/etc/systemd/system/maven_envoy.service', {binmode => ':raw'}, $service_content);
+open(my $fh, ">", "/etc/systemd/system/maven_envoy.service") or die $!;
+print $fh $envoy_stardust;
+close $fh;
