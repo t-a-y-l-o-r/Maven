@@ -79,4 +79,23 @@
     perl $HOME/Git/scripts/maven.pl "$@"
   }
   ```
-  If you aren't sure what that means then dont worry about it. This tool isn't for you
+  If you aren't sure what that means then dont worry about it. You can always forget this ever existed
+
+# Contributing
+
+  Don't! I will close all PR's without descrimination.
+
+  If for some reason you want to use this code then clone it and make it your own.
+  I will not be responsible for what you do with it
+
+# Why Is This Public?
+
+  Great question! Because in the world of open source there are two types of projects we like to imagine exist:
+
+    1) Someone builds something for money and then realizes really all things should be free because this capitalistic system we live in is desinged to parasitize every aspect of our waking moment.
+
+    or
+
+    2) Someone does something dumb late at night
+
+  This is the latter
