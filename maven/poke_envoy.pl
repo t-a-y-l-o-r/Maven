@@ -18,8 +18,5 @@ my $socket = IO::Socket::INET->new(
 );
 
 die "Could not create socket: $!\n" unless $socket;
-
 print $socket "timestamp, user, full_script_path, arguments\n";
-
 close($socket);
-
