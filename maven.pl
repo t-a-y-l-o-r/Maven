@@ -108,6 +108,8 @@ sub run_script {
   my ($script, @args) = @_;
   if ($script =~ /\.sh$/i) {
     system("bash", $script, @args);
+  } if ($script =~ /\.zsh$/i) {
+    system("zsh", $script, @args);
   } elsif ($script =~ /\.py$/i) {
     system("python", $script, @args);
   } elsif ($script =~ /\.pl$/i) {
