@@ -1,6 +1,8 @@
 #!/bin/zsh
 
 # TODO: fix this. Possible bug in maven itself prevents capture of user input?
+#
+# TODO: learn pkill &pgrep instead of this bs
 if [[ $# -eq 0 ]] ; then
   echo 'Please provide a process name to search and kill.'
   exit 1
