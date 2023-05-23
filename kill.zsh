@@ -1,5 +1,6 @@
 #!/bin/zsh
 
+# TODO: fix this. Possible bug in maven itself prevents capture of user input?
 if [[ $# -eq 0 ]] ; then
   echo 'Please provide a process name to search and kill.'
   exit 1
