@@ -1,4 +1,5 @@
 local/*
+!local/.gitkeep
 
 # Ignore .vscode folder
 .vscode/
