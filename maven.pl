@@ -104,19 +104,26 @@ sub nested_script {
 #  Magic
 # =============
 #
+my %pattern_match = (
+  sh => sub { $_[0] =~ /\.sh$/i },
+  zsh => sub { $_[0] =~ /\.zsh$/i },
+  py => sub { $_[0] =~ /\.py$/i },
+  pl => sub { $_[0] =~ /\.pl$/i },
+);
+
+my %system_calls = (
+  sh => sub { return system("bash", $_[0], @{$_[1]}) >> 8 },
+  zsh => sub { return system("zsh", $_[0], @{$_[1]}) >> 8 },
+  py => sub { return system("python", $_[0], @{$_[1]}) >> 8 },
+  pl => sub { return system("perl", $_[0], @{$_[1]}) >> 8 },
+);
+
 sub run_script {
   my ($script, @args) = @_;
-  if ($script =~ /\.sh$/i) {
-    return system("bash", $script, @args) >> 8;
-  }
-  if ($script =~ /\.zsh$/i) {
-    return system("zsh", $script, @args) >> 8;
-  }
-  if ($script =~ /\.py$/i) {
-    return system("python", $script, @args) >> 8;
-  }
-  if ($script =~ /\.pl$/i) {
-    return system("perl", $script, @args) >> 8;
+  for my $key (keys %pattern_match) {
+    if ($pattern_match{$key}->($script)) {
+      return $system_calls{$key}->($script, \@args);
+    }
   }
   print "Cannot find a runner for script of type: $script\n";
   return 1;
