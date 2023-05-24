@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-<<"README";
+=pod
   ===============
     Description
   ===============
@@ -39,7 +39,7 @@
   3. Argument type detection
   4. Runner
   5. Main
-README
+=cut
 
 #
 # =============
@@ -104,25 +104,32 @@ sub nested_script {
 #  Magic
 # =============
 #
-my %pattern_match = (
-  sh => sub { $_[0] =~ /\.sh$/i },
+=pod
+  TODO: setup some sort of configurable way to decide how the interpretors get called
+  load that into a fancy hash
+  then check that hash before calling the default
+  ASSUMING the $key is valid in %supported_langs
+
+  TODO: also decide if we care enough to dynamically load new languages / interpretors
+  based on some config? maybe this is the same problem is one level deeper
+=cut
+
+my %supported_langs = (
+  bash => sub { $_[0] =~ /\.sh$/i },
   zsh => sub { $_[0] =~ /\.zsh$/i },
-  py => sub { $_[0] =~ /\.py$/i },
-  pl => sub { $_[0] =~ /\.pl$/i },
+  python => sub { $_[0] =~ /\.py$/i },
+  perl => sub { $_[0] =~ /\.pl$/i },
 );
 
-my %system_calls = (
-  sh => sub { return system("bash", $_[0], @{$_[1]}) >> 8 },
-  zsh => sub { return system("zsh", $_[0], @{$_[1]}) >> 8 },
-  py => sub { return system("python", $_[0], @{$_[1]}) >> 8 },
-  pl => sub { return system("perl", $_[0], @{$_[1]}) >> 8 },
-);
+my $default_system_call = sub {
+  return system($_[0], $_[1], @{$_[2]}) >> 8;
+};
 
 sub run_script {
   my ($script, @args) = @_;
-  for my $key (keys %pattern_match) {
-    if ($pattern_match{$key}->($script)) {
-      return $system_calls{$key}->($script, \@args);
+  for my $key (keys %supported_langs) {
+    if ($supported_langs{$key}->($script)) {
+      return $default_system_call->($key, $script, \@args);
     }
   }
   print "Cannot find a runner for script of type: $script\n";
