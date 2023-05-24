@@ -47,12 +47,10 @@ README
 # =============
 #
 
-use 5.34.0;
-use strict;
-use warnings;
+# v5.34.0
+use Modern::Perl '2022';
 use File::Find;
 use Cwd 'abs_path';
-use File::Basename;
 
 #
 # =============
