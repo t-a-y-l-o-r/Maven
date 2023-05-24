@@ -107,18 +107,19 @@ sub nested_script {
 sub run_script {
   my ($script, @args) = @_;
   if ($script =~ /\.sh$/i) {
-    system("bash", $script, @args);
-  } if ($script =~ /\.zsh$/i) {
-    system("zsh", $script, @args);
-  } elsif ($script =~ /\.py$/i) {
-    system("python", $script, @args);
-  } elsif ($script =~ /\.pl$/i) {
-    system("perl", $script, @args);
-  } else {
-    print "Cannot find a runner for script of type: $script\n";
-    return 1;
+    return system("bash", $script, @args) >> 8;
   }
-  return 0;
+  if ($script =~ /\.zsh$/i) {
+    return system("zsh", $script, @args) >> 8;
+  }
+  if ($script =~ /\.py$/i) {
+    return system("python", $script, @args) >> 8;
+  }
+  if ($script =~ /\.pl$/i) {
+    return system("perl", $script, @args) >> 8;
+  }
+  print "Cannot find a runner for script of type: $script\n";
+  return 1;
 }
 
 #
