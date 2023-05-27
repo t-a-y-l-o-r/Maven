@@ -51,6 +51,7 @@
 use Modern::Perl '2022';
 use File::Find;
 use Cwd 'abs_path';
+use Expect;
 
 #
 # =============
@@ -119,15 +120,37 @@ my %supported_langs = (
   perl => sub { $_[0] =~ /\.pl$/i },
 );
 
-my $default_system_call = sub {
-  return system($_[0], $_[1], @{$_[2]}) >> 8;
-};
+sub manage_keyboard_input {
+  my $expect = $_[1];
+  my $input = <STDIN>;
+  chomp($input);
+  $expect->send();
+
+}
+
+sub call {
+  my $child = Expect->spawn($_[0], $_[1], @{$_[2]}) or die "Cannot spawn child process";
+  $child->expect(
+    undef, # no timeout
+    [
+      # we assume that ALL prompts start with: [?]
+      qr/^\[\?\].*$/sm => sub {
+        $child->send(chomp(my $input = <STDIN>) . "\n");
+        exp_continue;
+      }
+    ],
+    [
+      timeout => sub { die "Somehow we timedout" }
+    ],
+  );
+  return $child->exitstatus() >> 8;
+}
 
 sub run_script {
   my ($script, @args) = @_;
   for my $key (keys %supported_langs) {
     if ($supported_langs{$key}->($script)) {
-      return $default_system_call->($key, $script, \@args);
+      return call($key, $script, \@args);
     }
   }
   print "Cannot find a runner for script of type: $script\n";
