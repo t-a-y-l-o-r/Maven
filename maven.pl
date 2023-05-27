@@ -86,7 +86,7 @@ sub nested_script {
 
   my $folder = SCRIPTS . "/" . $subfolder;
   if (! -d $folder) {
-    return undef;
+    return;
   }
 
   my $full_path;
@@ -120,22 +120,18 @@ my %supported_langs = (
   perl => sub { $_[0] =~ /\.pl$/i },
 );
 
-sub manage_keyboard_input {
-  my $expect = $_[1];
-  my $input = <STDIN>;
-  chomp($input);
-  $expect->send();
-
-}
-
 sub call {
-  my $child = Expect->spawn($_[0], $_[1], @{$_[2]}) or die "Cannot spawn child process";
+  my $child = Expect->new;
+  $child->raw_pty(1);
+  $child->spawn($_[0], $_[1], @{$_[2]}) or die "Cannot spawn child process";
   $child->expect(
     undef, # no timeout
     [
       # we assume that ALL prompts start with: [?]
       qr/^\[\?\].*$/sm => sub {
-        $child->send(chomp(my $input = <STDIN>) . "\n");
+        my $expect = shift;
+        chomp(my $input = <STDIN>);
+        $expect->send("$input\n");
         exp_continue;
       }
     ],
