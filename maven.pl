@@ -53,6 +53,7 @@ use File::Find;
 use Cwd 'abs_path';
 use Expect;
 use Readonly;
+use Carp;
 
 #
 # =============
@@ -61,11 +62,9 @@ use Readonly;
 #
 Readonly my $SCRIPTS => sub {
   my $dir = (getpwuid($<))[7] . "/Git/scripts";
-  -d $dir or die $dir . " is not a valid directory\n";
+  -d $dir or croak $dir . " is not a valid directory\n";
   return $dir
 } -> ();
-
-use constant PI => 3.14159;
 
 #
 # ==============================================
@@ -128,12 +127,17 @@ sub call {
   my $child = Expect->new;
   # like most perl modules expect is stupid and thinks that having your input echoed back at you is a good thing
   $child->raw_pty(1);
-  $child->spawn($runner, $script, @args) or die "Cannot spawn child process";
+  $child->spawn($runner, $script, @args) or croak "Cannot spawn child process";
   $child->expect(
     undef, # no timeout
     [
       # we assume that ALL prompts start with: [?]
-      qr/^\[\?\].*$/sm => sub {
+      qr/
+        ^
+        \[\?\]
+        .*
+        $
+      /smx => sub {
         my $expect = shift;
         chomp(my $input = <>);
         $expect->send("$input\n");
@@ -141,7 +145,7 @@ sub call {
       }
     ],
     [
-      timeout => sub { die "Somehow we timedout" }
+      timeout => sub { croak "Somehow we timedout" }
     ],
   );
   return $child->exitstatus() >> 8;
