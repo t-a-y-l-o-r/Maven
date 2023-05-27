@@ -124,6 +124,7 @@ my %supported_langs = (
 sub call {
   my ($runner, $script, @args) = @_;
   my $child = Expect->new;
+  # like most perl modules expect is stupid and thinks that having your input echoed back at you is a good thing
   $child->raw_pty(1);
   $child->spawn($runner, $script, @args) or die "Cannot spawn child process";
   $child->expect(
