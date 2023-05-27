@@ -52,13 +52,14 @@ use Modern::Perl '2022';
 use File::Find;
 use Cwd 'abs_path';
 use Expect;
+use Readonly;
 
 #
 # =============
 #  Constants, or at least what pass for a const in perl
 # =============
 #
-use constant SCRIPTS => sub {
+Readonly my $SCRIPTS => sub {
   my $dir = (getpwuid($<))[7] . "/Git/scripts";
   -d $dir or die $dir . " is not a valid directory\n";
   return $dir
@@ -77,14 +78,14 @@ sub top_level_script {
       $full_path = abs_path($File::Find::name);
       return;
     }
-  }, SCRIPTS);
+  }, $SCRIPTS);
   return -f $full_path ? $full_path : undef;
 }
 
 sub nested_script {
   my ($subfolder, $script) = @_;
 
-  my $folder = SCRIPTS . "/" . $subfolder;
+  my $folder = $SCRIPTS . "/" . $subfolder;
   if (! -d $folder) {
     return;
   }
@@ -95,7 +96,7 @@ sub nested_script {
       $full_path = abs_path($File::Find::name);
       return;
     }
-  }, SCRIPTS . "/" . $subfolder);
+  }, $SCRIPTS . "/" . $subfolder);
 
   return $full_path;
 }
@@ -121,16 +122,17 @@ my %supported_langs = (
 );
 
 sub call {
+  my ($runner, $script, @args) = @_;
   my $child = Expect->new;
   $child->raw_pty(1);
-  $child->spawn($_[0], $_[1], @{$_[2]}) or die "Cannot spawn child process";
+  $child->spawn($runner, $script, @args) or die "Cannot spawn child process";
   $child->expect(
     undef, # no timeout
     [
       # we assume that ALL prompts start with: [?]
       qr/^\[\?\].*$/sm => sub {
         my $expect = shift;
-        chomp(my $input = <STDIN>);
+        chomp(my $input = <>);
         $expect->send("$input\n");
         exp_continue;
       }
