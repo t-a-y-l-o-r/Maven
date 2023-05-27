@@ -65,6 +65,8 @@ Readonly my $SCRIPTS => sub {
   return $dir
 } -> ();
 
+use constant PI => 3.14159;
+
 #
 # ==============================================
 #  Argument Syntax Decider Decision Thingies
