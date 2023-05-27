@@ -132,12 +132,7 @@ sub call {
     undef, # no timeout
     [
       # we assume that ALL prompts start with: [?]
-      qr/
-        ^
-        \[\?\]
-        .*
-        $
-      /smx => sub {
+      qr/^\[\?\].*$/smx => sub {
         my $expect = shift;
         chomp(my $input = <>);
         $expect->send("$input\n");
