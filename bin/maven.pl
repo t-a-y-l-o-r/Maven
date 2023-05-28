@@ -87,13 +87,11 @@ Readonly my $SCRIPTS => sub {
 sub top_level_script {
   my ($path, $script) = @_;
   my $full_path;
-  print "$script\n";
   find(sub {
     if ($_ =~ /^$script/) {
       $full_path = abs_path($File::Find::name);
       return;
     }
-    print "$_\n";
   }, $path);
   return $full_path;
 }
