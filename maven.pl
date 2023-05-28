@@ -54,6 +54,10 @@ use Cwd 'abs_path';
 use Expect;
 use Readonly;
 use Carp;
+use JSON;
+
+use lib 'maven';
+use Synthesizer;
 
 #
 # =============
@@ -115,13 +119,6 @@ sub nested_script {
 #   TODO: also decide if we care enough to dynamically load new languages / interpretors
 #   based on some config? maybe this is the same problem is one level deeper
 
-my %supported_langs = (
-  bash => sub { $_[0] =~ /\.sh$/i },
-  zsh => sub { $_[0] =~ /\.zsh$/i },
-  python => sub { $_[0] =~ /\.py$/i },
-  perl => sub { $_[0] =~ /\.pl$/i },
-);
-
 sub call {
   my ($runner, $script, @args) = @_;
   my $child = Expect->new;
@@ -148,13 +145,9 @@ sub call {
 
 sub run_script {
   my ($script, @args) = @_;
-  for my $key (keys %supported_langs) {
-    if ($supported_langs{$key}->($script)) {
-      return call($key, $script, \@args);
-    }
-  }
-  print "Cannot find a runner for script of type: $script\n";
-  return 1;
+  my $synth = Synthesizer->new;
+  my $runner = $synth->divine($script);
+  return call($runner, $script, \@args);
 }
 
 #
