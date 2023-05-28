@@ -52,7 +52,7 @@ sub essence_of {
   return $self->{essence}{$the_arcana};
 }
 
-Readonly my %supported_arcana = (
+my %supported_arcana = (
   bash => sub { $_[0] =~ /\.sh$/i },
   zsh => sub { $_[0] =~ /\.zsh$/i },
   python => sub { $_[0] =~ /\.py$/i },
