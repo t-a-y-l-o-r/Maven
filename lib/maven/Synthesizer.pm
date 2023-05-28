@@ -5,6 +5,7 @@ use JSON;
 use Readonly;
 use Carp;
 
+# TODO: lets get fancy with tied variables
 our $DEFAULT_ESSENCE;
 our $the_old_ways_are_best = sub {
   my $dir = (getpwuid($<))[7] . "/.config/maven/synth.json";
