@@ -84,7 +84,7 @@ sub top_level_script {
       return;
     }
   }, $SCRIPTS);
-  return -f $full_path ? $full_path : undef;
+  return $full_path;
 }
 
 sub nested_script {
