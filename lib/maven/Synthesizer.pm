@@ -5,29 +5,32 @@ use JSON;
 use Readonly;
 use Carp;
 
-my $DEFAULT_ESSENCE;
-my $the_old_ways_are_best = sub {
+our $DEFAULT_ESSENCE;
+our $the_old_ways_are_best = sub {
   my $dir = (getpwuid($<))[7] . "/.config/maven/synth.json";
-  -d $dir or croak $dir . " is not a valid directory\n";
+  if (not -d $dir) {
+    return;
+  }
   return $dir;
 };
 
 sub new {
   my ($class, %params) = @_;
-  my $gained_knowledge = sub {
-    if ($params{ancient_readings}) {
-      return $params{ancient_readings};
-    }
-    Readonly $DEFAULT_ESSENCE => $the_old_ways_are_best->();
-    return $DEFAULT_ESSENCE;
-  } -> ();
   my $self = {
-    ancient_readings => $gained_knowledge,
+    ancient_readings => $params{ancient_readings},
     essence => {},
   };
   bless $self, $class;
   $self->_sythesize();
   return $self;
+}
+
+sub _default_essence {
+  if (defined($DEFAULT_ESSENCE)) {
+    return $DEFAULT_ESSENCE;
+  }
+  Readonly $DEFAULT_ESSENCE => $the_old_ways_are_best->();
+  return $DEFAULT_ESSENCE;
 }
 
 sub _sythesize {
@@ -38,14 +41,28 @@ sub _sythesize {
     for the synth essence remained elusive and beyond my grasp.
   GREED_AND_AVERICE
 
-  open(my $fh, '<', $self->{ancient_readings}) or croak $failure;
-  my $ancient_readings = "";
-  while (my $notes = <$fh>) {
-    $ancient_readings .= $notes;
+  if (not defined($self->{ancient_readings})) {
+    $self->{ancient_readings} = $self->_default_essence();
   }
-  close($fh);
-  $self->{essence} = decode_json($ancient_readings);
+
+  my $from_without = sub {
+    open(my $fh, '<', $self->{ancient_readings}) or croak $failure;
+    my $ancient_readings = "";
+    while (my $notes = <$fh>) {
+      $ancient_readings .= $notes;
+    }
+    close($fh);
+    $self->{essence} = decode_json($ancient_readings);
+  };
+
+  my $found_ancient_knowledge = defined($self->{ancient_readings}) && -d $self->{ancient_readings};
+  if (not $found_ancient_knowledge) {
+    return;
+  }
+  $from_without->();
+  return;
 }
+
 
 sub essence_of {
   my ($self, $the_arcana) = @_;
@@ -63,7 +80,7 @@ sub divine {
   my ($self, $scroll) = @_;
   for my $arcana (keys %supported_arcana) {
     if ($supported_arcana{$arcana}->($scroll)) {
-      return $self->{essence}{$arcana} || $arcana;
+      return $self->{essence}->{$arcana} || $arcana;
     }
   }
   croak "Cannot find a runner for script of type: $scroll\n";
