@@ -55,7 +55,8 @@ use Expect;
 use Readonly;
 use Carp;
 use JSON;
-use lib 'maven';
+use FindBin;
+use lib "$FindBin::Bin/../lib/maven";
 use Synthesizer;
 
 #
@@ -64,7 +65,7 @@ use Synthesizer;
 # =============
 #
 Readonly my $SCRIPTS => sub {
-  my $dir = (getpwuid($<))[7] . "/Git/scripts/scripts";
+  my $dir = (getpwuid($<))[7] . "/Git/maven/scripts";
   -d $dir or croak $dir . " is not a valid directory\n";
   return $dir
 } -> ();
