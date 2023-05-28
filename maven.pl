@@ -111,11 +111,6 @@ sub nested_script {
 #  Magic
 # =============
 #
-#   TODO: setup some sort of configurable way to decide how the interpretors get called
-#   load that into a fancy hash
-#   then check that hash before calling the default
-#   ASSUMING the $key is valid in %supported_langs
-#
 #   TODO: also decide if we care enough to dynamically load new languages / interpretors
 #   based on some config? maybe this is the same problem is one level deeper
 
