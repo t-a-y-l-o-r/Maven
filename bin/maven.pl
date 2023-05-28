@@ -64,26 +64,37 @@ use Synthesizer;
 #  Constants, or at least what pass for a const in perl
 # =============
 #
+
+Readonly my $UTILITY => sub {
+  my $dir = (getpwuid($<))[7] . "/Git/maven/utility_belt";
+  -d $dir or croak $dir . " is not a valid directory\n";
+  return $dir
+} -> ();
+
 Readonly my $SCRIPTS => sub {
   my $dir = (getpwuid($<))[7] . "/Git/maven/scripts";
   -d $dir or croak $dir . " is not a valid directory\n";
   return $dir
 } -> ();
 
+
 #
 # ==============================================
 #  Argument Syntax Decider Decision Thingies
 # ==============================================
 #
+
 sub top_level_script {
-  my $script = shift;
+  my ($path, $script) = @_;
   my $full_path;
+  print "$script\n";
   find(sub {
     if ($_ =~ /^$script/) {
       $full_path = abs_path($File::Find::name);
       return;
     }
-  }, $SCRIPTS);
+    print "$_\n";
+  }, $path);
   return $full_path;
 }
 
@@ -150,14 +161,18 @@ sub run_script {
 #  The part that matters
 # ======================
 #
-my $script_path = top_level_script($ARGV[0]);
 
-if (defined $script_path) {
-  shift @ARGV;
-  exit(run_script($script_path, @ARGV));
+
+my @dirs = ($UTILITY, $SCRIPTS);
+foreach my $path (@dirs) {
+  my $script_path = top_level_script($path, $ARGV[0]);
+  if (defined $script_path) {
+    shift @ARGV;
+    exit(run_script($script_path, @ARGV));
+  }
 }
 
-$script_path = nested_script($ARGV[0], $ARGV[1]);
+my $script_path = nested_script($ARGV[0], $ARGV[1]);
 
 if (defined $script_path) {
  shift @ARGV;
