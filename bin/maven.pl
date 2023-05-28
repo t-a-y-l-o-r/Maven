@@ -64,7 +64,7 @@ use Synthesizer;
 # =============
 #
 Readonly my $SCRIPTS => sub {
-  my $dir = (getpwuid($<))[7] . "/Git/scripts";
+  my $dir = (getpwuid($<))[7] . "/Git/scripts/scripts";
   -d $dir or croak $dir . " is not a valid directory\n";
   return $dir
 } -> ();
