@@ -5,6 +5,8 @@ use JSON;
 use Readonly;
 use Carp;
 
+use feature 'signatures';
+
 #   TODO: also decide if we care enough to dynamically load new languages / interpretors
 #   based on some config? maybe this is the same problem is one level deeper
 
@@ -19,8 +21,7 @@ our $the_old_ways_are_best = sub {
   return $dir;
 };
 
-sub new {
-  my ($class, %params) = @_;
+sub new ($class, %params) {
   my $self = {
     ancient_readings => $params{ancient_readings},
     essence => {},
@@ -30,7 +31,7 @@ sub new {
   return $self;
 }
 
-sub _default_essence {
+sub _default_essence ($self) {
   if (defined($DEFAULT_ESSENCE)) {
     return $DEFAULT_ESSENCE;
   }
@@ -38,9 +39,7 @@ sub _default_essence {
   return $DEFAULT_ESSENCE;
 }
 
-sub _sythesize {
-  my ($self) = @_;
-
+sub _sythesize ($self) {
   my $failure = <<~'GREED_AND_AVERICE';
     The futile pursuit of magic left me empty-handed,
     for the synth essence remained elusive and beyond my grasp.
@@ -68,12 +67,6 @@ sub _sythesize {
   return;
 }
 
-
-sub essence_of {
-  my ($self, $the_arcana) = @_;
-  return $self->{essence}{$the_arcana};
-}
-
 my %supported_arcana = (
   bash => sub { $_[0] =~ /\.sh$/i },
   zsh => sub { $_[0] =~ /\.zsh$/i },
@@ -81,8 +74,7 @@ my %supported_arcana = (
   perl => sub { $_[0] =~ /\.pl$/i },
 );
 
-sub divine {
-  my ($self, $scroll) = @_;
+sub divine ($self, $scroll) {
   for my $arcana (keys %supported_arcana) {
     if ($supported_arcana{$arcana}->($scroll)) {
       return $self->{essence}->{$arcana} || $arcana;
