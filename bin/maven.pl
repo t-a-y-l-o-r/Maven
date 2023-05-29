@@ -97,7 +97,11 @@ sub top_level_script ($path, $script) {
       return;
     }
   }, $path);
-  return $full_path;
+  my $is_file = defined($full_path) && -f $full_path;
+  if ($is_file) {
+    return $full_path;
+  }
+  return;
 }
 
 sub nested_script ($subfolder, $script) {
@@ -114,7 +118,11 @@ sub nested_script ($subfolder, $script) {
     }
   }, $SCRIPTS . "/" . $subfolder);
 
-  return $full_path;
+  my $is_file = defined($full_path) && -f $full_path;
+  if ($is_file) {
+    return $full_path;
+  }
+  return;
 }
 
 #
