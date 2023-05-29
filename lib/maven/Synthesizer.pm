@@ -5,6 +5,9 @@ use JSON;
 use Readonly;
 use Carp;
 
+#   TODO: also decide if we care enough to dynamically load new languages / interpretors
+#   based on some config? maybe this is the same problem is one level deeper
+
 # TODO: lets get fancy with tied variables
 # OR: perl attributes sounds pretty cool
 our $DEFAULT_ESSENCE;

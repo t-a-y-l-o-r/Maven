@@ -120,8 +120,6 @@ sub nested_script {
 #  Magic
 # =============
 #
-#   TODO: also decide if we care enough to dynamically load new languages / interpretors
-#   based on some config? maybe this is the same problem is one level deeper
 
 sub call {
   my ($runner, $script, @args) = @_;
