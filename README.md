@@ -41,8 +41,20 @@
 
 # Configuration
 
-  None! Maven knows all and therefore knows that no configuration is the best configuration.
-  It works the way it works
+  You can configure which "runner" is used when a language is detected.
+  In fact this also technically allows maven to work on languages outside of it's original scrope.
+  But I haven't tested that so good luck.
+
+  The config file lives here:
+    ~/.config/maven/synth.json
+
+  And here is an example usage:
+
+  ```json
+  {
+    "perl": "~/perl5/perlbrew/perls/perl-5.36.1/bin/perl5.36.1"
+  }
+  ```
 
 # Structure
 
@@ -83,10 +95,7 @@
 
 # Contributing
 
-  Don't! I will close all PR's without descrimination.
-
-  If for some reason you want to use this code then clone it and make it your own.
-  I will not be responsible for what you do with it
+  I'd prefer if you didn't! Instead feel free to fork it and make your own copy.
 
 # Why Is This Public?
 
