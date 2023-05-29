@@ -49,13 +49,18 @@
 
 # v5.34.0
 use Modern::Perl '2022';
+
+use JSON;
+use FindBin;
 use File::Find;
 use Cwd 'abs_path';
+
 use Expect;
 use Readonly;
 use Carp;
-use JSON;
-use FindBin;
+
+use feature 'signatures';
+
 use lib "$FindBin::Bin/../lib/maven";
 use Synthesizer;
 
@@ -84,8 +89,7 @@ Readonly my $SCRIPTS => sub {
 # ==============================================
 #
 
-sub top_level_script {
-  my ($path, $script) = @_;
+sub top_level_script ($path, $script) {
   my $full_path;
   find(sub {
     if ($_ =~ /^$script/) {
@@ -96,9 +100,7 @@ sub top_level_script {
   return $full_path;
 }
 
-sub nested_script {
-  my ($subfolder, $script) = @_;
-
+sub nested_script ($subfolder, $script) {
   my $folder = $SCRIPTS . "/" . $subfolder;
   if (! -d $folder) {
     return;
@@ -121,8 +123,7 @@ sub nested_script {
 # =============
 #
 
-sub call {
-  my ($runner, $script, @args) = @_;
+sub call ($runner, $script, @args) {
   my $child = Expect->new;
   # like most perl modules expect is stupid and thinks that having your input echoed back at you is a good thing
   $child->raw_pty(1);
@@ -145,8 +146,7 @@ sub call {
   return $child->exitstatus() >> 8;
 }
 
-sub run_script {
-  my ($script, @args) = @_;
+sub run_script ($script, @args) {
   my $synth = Synthesizer->new;
   my $runner = $synth->divine($script);
   return call($runner, $script, \@args);
