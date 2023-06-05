@@ -6,7 +6,7 @@ use Cwd;
 
 @ARGV == 2 or die "This script requires a project_prefix and a command_name\n";
 
-my $project_prefix = getcwd() . "/" .$ARGV[0];
+my $project_prefix = getcwd() . "/" . $ARGV[0];
 my $command_name = $ARGV[1];
 
 defined $project_prefix or die "Project/app prefix is requied\n";

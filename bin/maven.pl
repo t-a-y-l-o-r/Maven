@@ -131,11 +131,11 @@ sub nested_script ($subfolder, $script) {
 # =============
 #
 
-sub call ($runner, $script, @args) {
+sub call ($runner, $script, $args_ref) {
   my $child = Expect->new;
   # like most perl modules expect is stupid and thinks that having your input echoed back at you is a good thing
   $child->raw_pty(1);
-  $child->spawn($runner, $script, @args) or croak "Cannot spawn child process";
+  $child->spawn($runner, $script, @{$args_ref}) or croak "Cannot spawn child process";
   $child->expect(
     undef, # no timeout
     [
