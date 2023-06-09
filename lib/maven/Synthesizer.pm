@@ -14,11 +14,11 @@ use feature 'signatures';
 # OR: perl attributes sounds pretty cool
 our $DEFAULT_ESSENCE;
 our $the_old_ways_are_best = sub {
-  my $dir = (getpwuid($<))[7] . "/.config/maven/synth.json";
-  if (not -d $dir) {
+  my $synth = (getpwuid($<))[7] . "/.config/maven/synth.json";
+  if (not -f $synth) {
     return;
   }
-  return $dir;
+  return $synth;
 };
 
 sub new ($class, %params) {
@@ -59,7 +59,10 @@ sub _sythesize ($self) {
     $self->{essence} = decode_json($ancient_readings);
   };
 
-  my $found_ancient_knowledge = defined($self->{ancient_readings}) && -d $self->{ancient_readings};
+  my $found_ancient_knowledge = defined($self->{ancient_readings}) && -f $self->{ancient_readings};
+
+  my $isafile = (-f $self->{ancient_readings}) + 0;
+
   if (not $found_ancient_knowledge) {
     return;
   }
@@ -68,16 +71,35 @@ sub _sythesize ($self) {
 }
 
 my %supported_arcana = (
-  bash => sub { $_[0] =~ /\.sh$/i },
-  zsh => sub { $_[0] =~ /\.zsh$/i },
-  python => sub { $_[0] =~ /\.py$/i },
-  perl => sub { $_[0] =~ /\.pl$/i },
+  "bash" => {
+    "runner" => "bash",
+    "extension" => "sh",
+  },
+  "zsh" => {
+    "runner" => "zsh",
+    "extension" => "zsh",
+  },
+  "python" => {
+    "runner" => "python",
+    "extension" => "py",
+  },
+  "perl" => {
+    "runner" => "perl",
+    "extension" => "pl",
+  },
 );
 
+sub matcher ($scroll, $discipline) {
+  return $scroll =~ /\.\Q$discipline\E$/i
+}
+
+
 sub divine ($self, $scroll) {
-  for my $arcana (keys %supported_arcana) {
-    if ($supported_arcana{$arcana}->($scroll)) {
-      return $self->{essence}->{$arcana} || $arcana;
+  my %innate_and_learned = (%supported_arcana, %{$self->{essence}});
+  for my $arcana (keys %innate_and_learned) {
+    my $discipline = $innate_and_learned{$arcana}->{extension};
+    if (matcher($scroll, $discipline)) {
+      return $innate_and_learned{$arcana}->{runner};
     }
   }
   croak "Cannot find a runner for script of type: $scroll\n";
