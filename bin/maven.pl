@@ -145,6 +145,17 @@ sub call ($runner, $script, $args_ref) {
         chomp(my $input = <>);
         $expect->send("$input\n");
         exp_continue;
+      },
+    ],
+    [
+      # allow sudo to work
+      qr/^\[sudo\].*$/smx => sub {
+        system("stty -echo");
+        my $expect = shift;
+        chomp(my $input = <>);
+        $expect->send("$input\n");
+        system("stty echo");
+        exp_continue;
       }
     ],
     [
