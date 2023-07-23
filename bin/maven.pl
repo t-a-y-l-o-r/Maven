@@ -58,6 +58,7 @@ use Cwd 'abs_path';
 use Expect;
 use Readonly;
 use Carp;
+use Term::ANSIColor;
 
 use feature 'signatures';
 
@@ -131,11 +132,56 @@ sub nested_script ($subfolder, $script) {
 # =============
 #
 
+sub pre_check_and_fix ($runner, $script) {
+  my $fix_runner = sub {
+    my $message = "Runner '$runner' is not executable, would you like to change its permissions to make it executable? [Y/n]: ";
+    print $message;
+    my $response = <>;
+    chomp($response);
+    if (lc($response) eq 'y') {
+      system("chmod", "+x", $runner) == 0 or croak color('red') . "Failed to make runner '$runner' executable\n" . color('reset');
+      print "\r" . " " x length($message) . "\r";
+    } else {
+      croak "Runner '$runner' is not executable\n";
+    }
+  };
+
+  my $fix_script = sub {
+    my $message = "Script '$script' is not executable, would you like to change its permissions to make it executable? [Y/n]: ";
+    print $message;
+    my $response = <>;
+    chomp($response);
+    if (lc($response) eq 'y') {
+      system("chmod", "+x", $script) == 0 or croak color('red') . "Failed to make script '$script' executable\n" . color('reset');
+      print "\r" . " " x length($message) . "\r";
+    } else {
+      croak "Script '$script' is not executable\n";
+    }
+  };
+
+  croak color('red') . "Runner '$runner' does not exist\n" . color('reset') unless -e $runner;
+  croak color('red') . "Script '$script' does not exist\n" . color('reset') unless -e $script;
+  $fix_runner->() unless -x $runner;
+  $fix_script->() unless -x $script;
+  return;
+}
+
 sub call ($runner, $script, $args_ref) {
   my $child = Expect->new;
   # like most perl modules expect is stupid and thinks that having your input echoed back at you is a good thing
   $child->raw_pty(1);
-  $child->spawn($runner, $script, @{$args_ref}) or croak "Cannot spawn child process";
+  my $diagnostic_info = sub {
+    my $info = '';
+    $info .= "\nCWD: " . `pwd`;
+    $info .= "Runner: $runner\n";
+    $info .= color('red') . "\tdoes not exist or is not executable by the current process\n" . color('reset') unless -x $runner;
+    $info .= "Script: $script\n";
+    $info .= color('red') . "\tdoes not exist or is not executable by the current process\n" . color('reset') unless -x $script;
+    $info .= (defined $args_ref and @$args_ref ? "Arguments: " . join(", ", @{$args_ref}) : color('yellow') . "No Arguments" . color('reset')) . "\n";
+    return $info;
+  };
+  pre_check_and_fix($runner, $script);
+  $child->spawn($runner, $script, @{$args_ref}) or croak "Cannot spawn child process\n" . $diagnostic_info->();
   $child->expect(
     undef, # no timeout
     [

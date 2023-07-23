@@ -99,7 +99,7 @@ sub divine ($self, $scroll) {
   for my $arcana (keys %innate_and_learned) {
     my $discipline = $innate_and_learned{$arcana}->{extension};
     if (matcher($scroll, $discipline)) {
-      return $innate_and_learned{$arcana}->{runner};
+      return glob($innate_and_learned{$arcana}->{runner});
     }
   }
   croak "Cannot find a runner for script of type: $scroll\n";
